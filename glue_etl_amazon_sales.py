@@ -47,7 +47,7 @@ Outputs generados
 from datetime import datetime
 
 from airflow import DAG
-from airflow.operators.python import PythonOperator
+from airflow.providers.standard.operators.python import PythonOperator
 
 from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
@@ -146,7 +146,7 @@ def transform(**kwargs):
     try:
         df = spark.read.parquet(INTERMEDIATE_PATH)
 
-        # Eliminar columnas basura y deduplicar
+        # Eliminar columnas basura y eliminar duplicados
         df = df.drop("extra_col", "row_index")
         df = df.dropDuplicates(["order_id"])
 
@@ -252,7 +252,7 @@ def load_verify(**kwargs):
 with DAG(
     dag_id="amazon_sales_etl",
     description="ETL pipeline para Amazon Sales Report: CSV → Parquet con PySpark",
-    schedule_interval=None,
+    schedule=None,
     start_date=datetime(2024, 1, 1),
     catchup=False,
     tags=["etl", "amazon", "pyspark"],
